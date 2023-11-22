@@ -2,60 +2,48 @@ from flask import Flask, render_template, request
 import requests
 import json
 
-app = Flask(__name__)
+from models.report import Table, Row, Cell, Report, buildReport
 
+app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    response_text = None
+    filteredJson = None
+    apiResponseJson = None
+    report = None
 
     if request.method == 'POST':
-        # Get the uploaded file from the form
+        # Get the uploaded file from the form.
         uploaded_file = request.files['file']
 
-        # Make the API request and obtain the JSON response
+        # Make the API request and obtain the JSON response.
         url = 'https://app.nanonets.com/api/v2/OCR/Model/4b02ca67-557a-4cd3-af8e-a19dcc58898c/LabelUrls/?async=false'
         headers = {'accept': 'application/x-www-form-urlencoded'}
         files = {'file': (uploaded_file.filename, uploaded_file.stream, uploaded_file.mimetype)}
         auth = requests.auth.HTTPBasicAuth('dba71e7c-7d8b-11ee-998f-7efeff8449b1', '')
 
-        response = requests.post(url, headers=headers, auth=auth, files=files)
+        apiResponse = requests.post(url, headers=headers, auth=auth, files=files)
 
-        # Get json raw object responsed from Nanonet
-        response_json = response.json()
+        # Get json raw object responsed from Nanonet.
+        apiResponseJson = apiResponse.json()
 
-        # Filter to get only cells from json object
-        filteredJson = response_json.get("result", [])[0].get("prediction", [])[0].get("cells", [])
+        # Filter to get only table cells from json object.
+        filteredJson = apiResponseJson.get("result", [])[0].get("prediction", [])
 
-        # Initiate the final json object
-        finalJson = {'table': {'rows': []}}
-        row = []
-        rowNumber = 0
-        finalJson['table']['rows'].append(row)
+    # TODO:Uncomment the below code to test with sample response instead of api response.
+    '''
+    with open('data/sampleResponse.json', 'r') as file:
+        sampleResponseJson = json.load(file)
+    filteredJson = sampleResponseJson.get("result", [])[0].get("prediction", [])
+    '''
 
-        # loop and fetch only necessary data from cell list and rebuild the final json
-        for cell in filteredJson:
+    # call buildReport function from model class to build report if the data is present.
+    if filteredJson is not None:
+        report = buildReport(filteredJson)
 
-            if (cell['row']) - 1 > rowNumber:
-                rowNumber += 1
-                rebuildCell = {
-                    'text': cell['text'],
-                }
+    reportJson = json.dumps(report, default=lambda o: o.__dict__, indent=2)
 
-                row = [rebuildCell]
-                finalJson['table']['rows'].append(row)
-
-            else:
-                rebuildCell = {
-                    'text': cell['text']
-                }
-                finalJson['table']['rows'][rowNumber].append(rebuildCell)
-
-        print(finalJson)
-        response_text = json.dumps(finalJson, indent=2)
-
-    # response_text = json.dumps(json_data, indent=2)
-    return render_template('index.html', response_text=response_text)
+    return render_template('index.html', response_text=reportJson)
 
 
 if __name__ == '__main__':

@@ -1,28 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OCR</title>
 </head>
-<body style = "font-family: 'Arial', sans-serif; background-color: #FFF0CE;">
-    <h1 style= "color: #0C356A; text-align: center;">Handwritten Text to Digital Text</h1>
 
-    <form action="/" method="post" enctype="multipart/form-data">
-        <label for="file">Choose Image:</label>
-        <input type="file" name="file" accept=".jpg, .jpeg, .png, .pdf" required>
-        <button type="submit"; style="padding: 10px 20px;
+<body style="font-family: 'Arial', sans-serif; background-color: #FFF0CE;">
+<h1 style="color: #0C356A; text-align: center;">Handwritten Text to Digital Text</h1>
+
+<form action="/" method="post" enctype="multipart/form-data">
+    <label>Choose Image:</label>
+    <input type="file" name="file" accept=".jpg, .jpeg, .png, .pdf" required>
+    <button type="submit" style="padding: 10px 20px;
             background-color: #0174BE; 
             color: #fff;
             border: none;
             border-radius: 4px;
-            cursor: pointer">Submit</button>
-    </form>
+            cursor: pointer">Submit
+    </button>
+</form>
 
-    {% if response_text %}
-        <h2>API Response:</h2>
-        <pre>{{ response_text }}</pre>
-    {% endif %}
+
+<h2>API Response:</h2>
+
+<!--container div to display tables-->
+<div id="table-container"></div>
+
+<!--     <pre>{{ response_text }}</pre>-->
+
+
 </body>
-</html>
 
+<script>
+
+    // Get Json object passed from backend.
+    var responseData = {{ response_text | tojson | safe }};
+
+    var jsonData = JSON.parse(responseData);
+
+    // Building table using the Json.
+    function buildTable(jsonData) {
+
+        var htmlTable = "<h3> Tables </h3>";
+
+        // Loop tables of Json and build.
+        jsonData.tables.forEach(function (table) {
+
+            htmlTable += "<table border='1'>";
+
+            // Loop through rows in the current table
+            table.rows.forEach(function (row) {
+                htmlTable += "<tr>";
+
+                // Loop through cells in the current row
+                row.cells.forEach(function (cell) {
+
+                    // Highlight cells based on score to notify the assurance.
+                    if (cell.score < 0.85) {
+
+                        htmlTable += "<td style='color:red'>" + cell.text + "</td>";
+                    }
+                    else if (cell.score > 0.95) {
+
+                        htmlTable += "<td style='color:green'>" + cell.text + "</td>";
+                    }
+                    else {
+                        htmlTable += "<td>" + cell.text + "</td>";
+                    }
+
+                });
+
+                htmlTable += "</tr>";
+            });
+
+            htmlTable += "</table>";
+        });
+
+        return htmlTable;
+    }
+
+    // Get the table container element
+    var tableContainer = document.getElementById("table-container");
+
+    // Build the table and insert it into the container
+    tableContainer.innerHTML = buildTable(jsonData);
+</script>
+
+</html>
