@@ -30,12 +30,10 @@ def index():
         # Filter to get only table cells from json object.
         filteredJson = apiResponseJson.get("result", [])[0].get("prediction", [])
 
-    # TODO:Uncomment the below code to test with sample response instead of api response.
-    '''
+    # Testing with sample response first before api response.
     with open('data/sampleResponse.json', 'r') as file:
         sampleResponseJson = json.load(file)
     filteredJson = sampleResponseJson.get("result", [])[0].get("prediction", [])
-    '''
 
     # call buildReport function from model class to build report if the data is present.
     if filteredJson is not None:

@@ -106,7 +106,7 @@
 <script>
 
     // Get Json object passed from backend.
-    var responseData = { response_text | tojson | safe };
+    var responseData = {{ response_text | tojson | safe }};
 
     var jsonData = JSON.parse(responseData);
 
