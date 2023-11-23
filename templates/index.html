@@ -1,161 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OCR</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            background-color: #f4f4f4;
-            color: #333;
-        }
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>OCR</title>
+        <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                background-color: #F9F7EC;
+                color: #373b4a;
+            }
 
-        header {
-            background-color: #222;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-        }
+            header {
+                background-color: #00581d;
+                color: #ffffff;
+                padding: 20px 0;
+                text-align: center;
+            }
 
-        section {
-            text-align: center;
-            padding: 20px;
-        }
-         section1 {
-            text-align: left;
-            padding: 50px;
-        }
+            section {
+                text-align: center;
+                padding: 20px;
+            }
+            section1 {
+                text-align: center;
+                padding: 50px;
+            }
 
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            color: #555;
-        }
-        h2 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        p {
-            font-size: 1.2em;
-            color: #555;
-            margin-bottom: 25px;
-        }
-        p1 {
-            font-size: 1.2em;
-            color: #555;
+            h1 {
+                font-size: 3em;
+                margin-bottom: 20px;
+                color: #ffffff;
+            }
+            h2 {
+                font-size: 2.5em;
+                margin-bottom: 20px;
+                color: #00581d;
+            }
             
-        }
-          
-
-        button {
-            display: inline-block;
-            padding: 15px 30px;
+            p {
+                font-size: 1.2em;
+                color: #373b4a;
+                margin-bottom: 25px;
+            }
+            label {
             font-size: 1.2em;
-            text-decoration: none;
-            color: #fff;
-            background-color: #222;
-            border-radius: 10px;
-            transition: background-color 0.3s ease;
-            
-        }
+            color: #00581d;
+            }
+            input {
+                margin-top: 10px;
+                padding: 10px;
+                border: 1px solid #00581d;
+                border-radius: 5px;
+            }            
+            button {
+                display: inline-block;
+                padding: 10px 25px;
+                font-size: 1.2em;
+                text-decoration: none;
+                color: #00581d;
+                background-color: #F9F7EC;
+                border-radius: 10px;
+                border-color: #00581d;
+                transition: background-color 0.2s ease;
+                cursor: pointer;
+            }
+            button:hover {
+                color: #ffffff;
+                background-color: #00581d
+            }
 
-        button:hover {
-            background-color: #555;
-        }
-    </style>
-</head>
+            /* Add styles for API Response section */
+            #table-container {
+                margin-top: 30px;
+            }
 
-<body> 
-     <header>
-        <h1>OCR PROJECT</h1>
-    </header>
-    <section>
-        <form action="/" method="post" enctype="multipart/form-data">
-        
-            <h2>Handwritten Text to Digital Text</h2>
-            <p>Convert your document to a Digital Text</p>
-            <label><p1>Choose Image:</p1></label>
-            <section><input type="file" name="file" accept=".jpg, .jpeg, .png, .pdf" required></section>
-            <button 
-                    type="submit" >Submit
-            </button>
-                
-        </form>
-    </section>
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+
+            table, th, td {
+                border: 1px solid #373b4a;
+            }
+
+            th, td {
+                padding: 15px;
+                text-align: left;
+            }
+
+            th {
+                background-color: #00581d;
+                color: #ffffff;
+            }
+
+            td {
+                background-color: #ffffff;
+                color: #373b4a;
+            }            
+        </style>
+    </head>
+
+    <body> 
+        <header>
+            <h1>OCR PROJECT</h1>
+        </header>
+        <section>
+            <form action="/" method="post" enctype="multipart/form-data">
+                <h2>Handwritten Text to Digital Text</h2>
+                <p>Convert your document to a Digital Text</p>
+                <label>Choose Image:</label>
+                <br>
+                <section><input type="file" name="file" accept=".jpg, .jpeg, .png, .pdf" required></section>
+                <br>
+                <button type="submit" >Submit</button>
+            </form>
+        </section>
+
+        <section1>
+            <h2>API Response:</h2>
+
+            <!--container div to display tables-->
+            <div id="table-container"></div>
+
+            <!--     <pre>{{ response_text }}</pre>-->
+
+        </section1>
+    </body>
 
 
-<section>
-    <h2>API Response:</h2>
+    <script>
 
-    <!--container div to display tables-->
-    <div id="table-container"></div>
+        // Get Json object passed from backend.
+        var responseData = {{ response_text | tojson | safe }};
 
-    <!--     <pre>{{ response_text }}</pre>-->
+        var jsonData = JSON.parse(responseData);
 
-</section>
-</body>
+        // Building table using the Json.
+        function buildTable(jsonData) {
 
+            var htmlTable = "<h3> Tables </h3>";
 
-<script>
+            // Loop tables of Json and build.
+            jsonData.tables.forEach(function (table) {
 
-    // Get Json object passed from backend.
-    var responseData = {{ response_text | tojson | safe }};
+                htmlTable += "<table border='0.5'>";
 
-    var jsonData = JSON.parse(responseData);
+                // Loop through rows in the current table
+                table.rows.forEach(function (row) {
+                    htmlTable += "<tr>";
 
-    // Building table using the Json.
-    function buildTable(jsonData) {
+                    // Loop through cells in the current row
+                    row.cells.forEach(function (cell) {
 
-        var htmlTable = "<h3> Tables </h3>";
+                        // Highlight cells based on score to notify the assurance.
+                        if (cell.score < 0.85) {
 
-        // Loop tables of Json and build.
-        jsonData.tables.forEach(function (table) {
+                            htmlTable += "<td style='color:red'>" + cell.text + "</td>";
+                        }
+                        else if (cell.score > 0.95) {
 
-            htmlTable += "<table border='1'>";
+                            htmlTable += "<td style='color:green'>" + cell.text + "</td>";
+                        }
+                        else {
+                            htmlTable += "<td>" + cell.text + "</td>";
+                        }
 
-            // Loop through rows in the current table
-            table.rows.forEach(function (row) {
-                htmlTable += "<tr>";
+                    });
 
-                // Loop through cells in the current row
-                row.cells.forEach(function (cell) {
-
-                    // Highlight cells based on score to notify the assurance.
-                    if (cell.score < 0.85) {
-
-                        htmlTable += "<td style='color:red'>" + cell.text + "</td>";
-                    }
-                    else if (cell.score > 0.95) {
-
-                        htmlTable += "<td style='color:green'>" + cell.text + "</td>";
-                    }
-                    else {
-                        htmlTable += "<td>" + cell.text + "</td>";
-                    }
-
+                    htmlTable += "</tr>";
                 });
 
-                htmlTable += "</tr>";
+                htmlTable += "</table>";
             });
 
-            htmlTable += "</table>";
-        });
+            return htmlTable;
+        }
 
-        return htmlTable;
-    }
+        // Get the table container element
+        var tableContainer = document.getElementById("table-container");
 
-    // Get the table container element
-    var tableContainer = document.getElementById("table-container");
-
-    // Build the table and insert it into the container
-    tableContainer.innerHTML = buildTable(jsonData);
-</script>
+        // Build the table and insert it into the container
+        tableContainer.innerHTML = buildTable(jsonData);
+    </script>
 
 </html>
