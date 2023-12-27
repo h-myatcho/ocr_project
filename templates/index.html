@@ -1,138 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR</title>
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>OCR</title>
-        <style>
-            body {
-                font-family: 'Arial', sans-serif;
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-                background-color: #F9F7EC;
-                color: #373b4a;
-            }
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" 
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Javascript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" 
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
 
-            header {
-                background-color: #00581d;
-                color: #ffffff;
-                padding: 20px 0;
-                text-align: center;
-            }
+    <style>
+      .bg-nav{
+        background-color: #9EB384 !important;
+      }
+      .a-nav{
+        color: #555555;
+        font-weight: 700;
+      }
+      .bg{
+        background-color: #FAF1E4 !important;
+      }
+      .hg-sec{
+        height: 35vh;
+      }
+      .mt-6{
+        margin-top: 6rem;
+      }
+      .api{
+        padding: 20px 0 100px 0;
+      }
+      #api{
+        min-height: 44vh;
+      }
+      #table-container{
+        padding: 20px 0 30px 0;
+        overflow-x: auto;
+        max-width: 100%;
+      }
+      #exportBtn{
+        float: right;
+        margin-right: 15px;
+      }    
+      
+      /* footer */
+      #footer {
+          background: #DED0B6;
+          padding: 0 0 30px 0;
+          color: #555555;
+          font-size: 14px;
+      }
+      #footer .copyright {
+          text-align: center;
+          padding-top: 30px;
+      }
+      #footer .credits {
+          padding-top: 10px;
+          text-align: center;
+          font-size: 13px;
+      }
+    </style>
+  </head>
+      
+  <body class="bg">
+    <header>
+      <nav class="navbar navbar-expand-lg bg-body-tertiary bg-nav fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand a-nav" href="#">OCR</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarScroll">
+                <ul class="navbar-nav ms-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+                    <li class="nav-item">
+                        <a class="nav-link a-nav active" aria-current="page" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link a-nav" href="/about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link a-nav" href="/contact">Contact</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+      </nav>
+    </header>
 
-            section {
-                text-align: center;
-                padding: 20px;
-            }
-            section1 {
-                text-align: center;
-                padding: 50px;
-            }
-
-            h1 {
-                font-size: 3em;
-                margin-bottom: 20px;
-                color: #ffffff;
-            }
-            h2 {
-                font-size: 2.5em;
-                margin-bottom: 20px;
-                color: #00581d;
-            }
-            
-            p {
-                font-size: 1.2em;
-                color: #373b4a;
-                margin-bottom: 25px;
-            }
-            label {
-            font-size: 1.2em;
-            color: #00581d;
-            }
-            input {
-                margin-top: 10px;
-                padding: 10px;
-                border: 1px solid #00581d;
-                border-radius: 5px;
-            }            
-            button {
-                display: inline-block;
-                padding: 10px 25px;
-                font-size: 1.2em;
-                text-decoration: none;
-                color: #00581d;
-                background-color: #F9F7EC;
-                border-radius: 10px;
-                border-color: #00581d;
-                transition: background-color 0.2s ease;
-                cursor: pointer;
-            }
-            button:hover {
-                color: #ffffff;
-                background-color: #00581d
-            }
-
-            /* Add styles for API Response section */
-            #table-container {
-                margin-top: 30px;
-            }
-
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 20px;
-            }
-
-            table, th, td {
-                border: 1px solid #373b4a;
-            }
-
-            th, td {
-                padding: 15px;
-                text-align: left;
-            }
-
-            th {
-                background-color: #00581d;
-                color: #ffffff;
-            }
-
-            td {
-                background-color: #ffffff;
-                color: #373b4a;
-            }            
-        </style>
-    </head>
-
-    <body> 
-        <header>
-            <h1>OCR PROJECT</h1>
-        </header>
-        <section>
+    <section class="hg-sec">
+      <div class="container mt-6">
+        <h2 class="text-center" style="font-weight: bold;">Handwritten Table to Excel Converter</h2>
+        <div class="d-flex align-items-center justify-content-center">
             <form action="/" method="post" enctype="multipart/form-data">
-                <h2>Handwritten Text to Digital Text</h2>
-                <p>Convert your document to a Digital Text</p>
-                <label>Choose Image:</label>
-                <br>
-                <section><input type="file" name="file" accept=".jpg, .jpeg, .png, .pdf" required></section>
-                <br>
-                <button type="submit" >Submit</button>
+                <p class="mt-4">Convert your document to Digital Table</p>
+                <div class="form-group">
+                    <label for="file">Choose Image:</label>
+                    <input type="file" class="form-control" id="file" name="file" accept=".jpg, .jpeg, .png, .pdf" required>
+                </div>
+                <button class="btn btn-outline-success my-2" type="submit" >Submit</button>
             </form>
-        </section>
+        </div>
+      </div>
+    </section>
 
-        <section1>
-            <h2>API Response:</h2>
+    <section class="container api" id="api">
+        <h2 class="text-center" style="font-weight: bold;">API Response</h2>
 
-            <!--container div to display tables-->
-            <div id="table-container"></div>
+        <!-- Container div to display tables -->
+        <div id="table-container-wrapper">
+          <div id="table-container"></div>
+        </div>
 
-            <!--     <pre>{{ response_text }}</pre>-->
+        <button class="btn btn-outline-success" id="exportBtn" onclick="exportTablesToExcel()">Export</button>
 
-        </section1>
-    </body>
-
+    </section>
 
     <script>
 
@@ -144,12 +133,12 @@
         // Building table using the Json.
         function buildTable(jsonData) {
 
-            var htmlTable = "<h3> Tables </h3>";
+            var htmlTable = "<h3 class='text-center mb-4'> Tables </h3>";
 
             // Loop tables of Json and build.
             jsonData.tables.forEach(function (table) {
 
-                htmlTable += "<table border='0.5'>";
+                htmlTable += "<table class='w-100 table-name table-bordered' border='1'>";
 
                 // Loop through rows in the current table
                 table.rows.forEach(function (row) {
@@ -187,6 +176,33 @@
 
         // Build the table and insert it into the container
         tableContainer.innerHTML = buildTable(jsonData);
+
+        // Export tables to excel
+        function exportTablesToExcel() {
+          var tableElements = document.getElementsByClassName("table-name")
+          console.log("Export Excel Files: ",tableElements)
+          
+          var workbook = XLSX.utils.book_new();
+          var tables = Array.from(tableElements)
+          tables.forEach(function(table, index) {
+            var sheet = XLSX.utils.table_to_sheet(table);
+            XLSX.utils.book_append_sheet(workbook, sheet, 'Sheet' + (index + 1));
+          });
+
+          // Save the workbook to a file
+          XLSX.writeFile(workbook, 'exported_data.xlsx');
+        }
+
     </script>
 
+    
+      <!-- ======= Footer ======= -->
+      <footer id="footer">
+        <div class="container">
+            <div class="copyright">
+            &copy; Copyright <strong><span>Codia</span></strong>. All Rights Reserved
+            </div>
+        </div>
+    
+  </body>
 </html>
