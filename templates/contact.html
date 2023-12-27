@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>OCR</title>
+
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" 
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet">
+        
+        <!-- Javascript -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" 
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+
+        <style>
+            .bg-nav{
+                background-color: #9EB384 !important;
+            }
+            .a-nav{
+                color: #555555;
+                font-weight: 700;
+            }
+            .bg{
+                background-color: #FAF1E4 !important;
+            }
+            .hg-sec{
+                height: 35vh;
+            }
+            .mt-6{
+                margin-top: 6rem;
+            }
+            .api{
+                padding: 20px 0 100px 0;
+            }
+            #api{
+                min-height: 44vh;
+            }
+            #table-container{
+                padding: 20px 0 30px 0;
+                overflow-x: auto;
+                max-width: 100%;
+            }
+            #exportBtn{
+                float: right;
+                margin-right: 15px;
+            }    
+            /* about */
+            .about .content h3 {
+                font-weight: 600;
+                font-size: 26px;
+            }
+            .about .content ul {
+                list-style: none;
+                padding: 0;
+            }
+            .about .content ul li {
+                padding-bottom: 10px;
+            }
+            .about .content ul i {
+                font-size: 20px;
+                padding-right: 4px;
+                color: #9EB384;
+            }
+            .about .content p:last-child {
+                margin-bottom: 0;
+            }
+            /* members */
+            .doctors .member {
+                margin-bottom: 20px;
+                overflow: hidden;
+                text-align: center;
+                border-radius: 4px;
+                background: #fff;
+                box-shadow: 0px 2px 15px rgba(63, 187, 192, 0.1);
+            }
+            .doctors .member .member-img {
+                position: relative;
+                overflow: hidden;
+            }
+            .doctors .member .social {
+                position: absolute;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                height: 40px;
+                opacity: 0;
+                transition: ease-in-out 0.3s;
+                background: rgba(255, 255, 255, 0.85);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .doctors .member .social a {
+                transition: color 0.3s;
+                color: #555555;
+                margin: 0 10px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .doctors .member .social a i {
+                line-height: 0;
+            }
+            .doctors .member .social a:hover {
+                color: #9EB384;
+            }
+            .doctors .member .social i {
+                font-size: 18px;
+                margin: 0 2px;
+            }
+            .doctors .member .member-info {
+                padding: 25px 15px;
+            }
+            .doctors .member .member-info h4 {
+                font-weight: 700;
+                margin-bottom: 5px;
+                font-size: 18px;
+                color: #555555;
+            }
+            .doctors .member .member-info span {
+                display: block;
+                font-size: 13px;
+                font-weight: 400;
+                color: #aaaaaa;
+            }
+            .doctors .member .member-info p {
+                font-style: italic;
+                font-size: 14px;
+                line-height: 26px;
+                color: #777777;
+            }
+            .doctors .member:hover .social {
+                opacity: 1;
+            }
+            /* contact */
+            .contact .info-box {
+                color: #444444;
+                text-align: center;
+                box-shadow: 0 0 20px rgba(214, 215, 216, 0.5);
+                padding: 20px 0 30px 0;
+            }
+            .contact .info-box i {
+                font-size: 32px;
+                color: #9EB384;
+                border-radius: 50%;
+                padding: 8px;
+                border: 2px dotted #9EB384;
+            }
+            .contact .info-box h3 {
+                font-size: 20px;
+                color: #777777;
+                font-weight: 700;
+                margin: 10px 0;
+            }
+            .contact .info-box p {
+                padding: 0;
+                line-height: 24px;
+                font-size: 14px;
+                margin-bottom: 0;
+            }
+            /* Section General */
+            section {
+                padding: 60px 0;
+                overflow: hidden;
+            }
+            .section-title {
+                text-align: center;
+                padding-bottom: 30px;
+            }
+            .section-title h2 {
+                font-size: 32px;
+                font-weight: bold;
+                text-transform: uppercase;
+                margin-bottom: 20px;
+                padding-bottom: 20px;
+                position: relative;
+            }
+            .section-title h2::after {
+                content: "";
+                position: absolute;
+                display: block;
+                width: 50px;
+                height: 3px;
+                background: #9EB384;
+                bottom: 0;
+                left: calc(50% - 25px);
+            }
+            .section-title p {
+                margin-bottom: 0;
+            }
+            /* footer */
+            #footer {
+                background: #DED0B6;
+                padding: 0 0 30px 0;
+                color: #555555;
+                font-size: 14px;
+            }
+            #footer .copyright {
+                text-align: center;
+                padding-top: 30px;
+            }
+            #footer .credits {
+                padding-top: 10px;
+                text-align: center;
+                font-size: 13px;
+            }
+        </style>
+    </head>
+        
+    <body class="bg">
+        <header>
+            <nav class="navbar navbar-expand-lg bg-body-tertiary bg-nav fixed-top">
+                <div class="container-fluid">
+                    <a class="navbar-brand a-nav" href="#">OCR</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarScroll">
+                        <ul class="navbar-nav ms-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+                            <li class="nav-item">
+                                <a class="nav-link a-nav" href="/">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link a-nav" href="/about">About</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link a-nav active" aria-current="page" href="/contact">Contact</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+            
+        <!-- ======= Contact Section ======= -->
+        <section id="contact" class="contact">
+            <div class="container mt-5">
+    
+            <div class="section-title">
+                <h2>Contact</h2>
+                <p>Our Deep Learning Research Laboratory is situated on the 10th floor of Classroom Building 4 (CB4) at King Mongkut's University of Technology Thonburi (KMUTT). For inquiries or collaborations, please don't hesitate to contact us.</p>
+            </div>
+    
+            </div>
+    
+            <div>
+            <iframe style="border:0; width: 100%; height: 350px;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3877.1070402519904!2d100.49386787537222!3d13.65125218673023!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e2a251bb6b0cf1%3A0xf656e94ff13324ad!2sKing%20Mongkut%E2%80%99s%20University%20of%20Technology%20Thonburi%20(KMUTT)!5e0!3m2!1sen!2sth!4v1702805210173!5m2!1sen!2sth" frameborder="0" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+    
+            <div class="container">
+    
+            <div class="row my-5">
+    
+                <div class="col-lg-12">
+    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-box mt-4">
+                                <i class="bx bx-map"></i>
+                                <h3>Our Address</h3>
+                                <p>126 Pracha Uthit Rd, Bang Mot, Thung Khru, <br>Bangkok, Thailand 10140</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="info-box mt-4">
+                                <i class="bx bx-envelope"></i>
+                                <h3>Email Us</h3>
+                                <p><a href="mailto:info@example.com" style="text-decoration: none;">info@example.com</a><br>
+                                    <a href="mailto:contact@example.com" style="text-decoration: none;">contact@example.com</a>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="info-box mt-4">
+                                <i class="bx bx-phone-call"></i>
+                                <h3>Call Us</h3>
+                                <p>+1 5589 55488 55<br>+1 6678 254445 41</p>
+                            </div>
+                        </div>
+                    </div>
+    
+                </div>
+        
+                
+    
+            </div>
+    
+            </div>
+        </section><!-- End Contact Section -->
+
+        <!-- ======= Footer ======= -->
+        <footer id="footer">
+            <div class="container">
+                <div class="copyright">
+                &copy; Copyright <strong><span>Codia</span></strong>. All Rights Reserved
+                </div>
+            </div>
+        </footer><!-- End Footer -->
+    </body>
