@@ -28,7 +28,7 @@ class Table:
         return f"Table(rows={self.rows})"
 
 
-class Report:
+class Page:
     def __init__(self):
         self.tables = []
 
@@ -36,7 +36,18 @@ class Report:
         self.tables.append(table)
 
     def __repr__(self):
-        return f"Report(tables={self.tables})"
+        return f"Page(tables={self.tables})"
+
+
+class Report:
+    def __init__(self):
+        self.pages = []
+
+    def add_table(self, page):
+        self.pages.append(page)
+
+    def __repr__(self):
+        return f"Report(pages={self.pages})"
 
 
 def buildReport(tablesJson):
@@ -44,33 +55,41 @@ def buildReport(tablesJson):
 
     report = Report()
 
-    # Loop table cells to build tables
-    for table_data in tablesJson:
+    # Loop through each page's tables
+    for page_data in tablesJson:
+        # If page_data is a list directly containing tables
+        if isinstance(page_data, list):
+            page_tables = page_data
+        else:
+            page_tables = page_data.get("tables", [])
 
-        table = Table()
+        # Loop through tables in the current page
+        for table_data in page_tables:
+            table = Table()
 
-        # Loop every cell in a table to rebuild rows and columns.
-        for cell_data in table_data.get("cells", []):
+            # Loop every cell in a table to rebuild rows and columns.
+            for cell_data in table_data.get("cells", []):
 
-            # Get row number of a cell and create a new cell first before assigning into its row.
-            row_id = cell_data.get("row")
-            cell = Cell(
-                column_id=cell_data.get("col"),
-                text=cell_data.get("text"),
-                score=cell_data.get("score")
-            )
+                # Get row number of a cell and create a new cell first before assigning into its row.
+                row_id = cell_data.get("row")
+                cell = Cell(
+                    column_id=cell_data.get("col"),
+                    text=cell_data.get("text"),
+                    score=cell_data.get("score")
+                )
 
-            # Try to find the existing row with the same row_id.
-            existing_row = next((row for row in table.rows if row.row_id == row_id), None)
+                # Try to find the existing row with the same row_id.
+                existing_row = next((row for row in table.rows if row.row_id == row_id), None)
 
-            # If the row doesn't exist, create a new row and add it to the table.
-            if not existing_row:
-                new_row = Row(row_id=row_id, cells=[cell])
-                table.add_row(new_row)
-            else:
-                # Add the cell to the existing row
-                existing_row.cells.append(cell)
-        # Add created table with full of data into report object.
-        report.add_table(table)
+                # If the row doesn't exist, create a new row and add it to the table.
+                if not existing_row:
+                    new_row = Row(row_id=row_id, cells=[cell])
+                    table.add_row(new_row)
+                else:
+                    # Add the cell to the existing row
+                    existing_row.cells.append(cell)
+
+            # Add created table with full of data into report object.
+            report.add_table(table)
 
     return report

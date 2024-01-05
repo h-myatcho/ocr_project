@@ -11,6 +11,7 @@ def index():
     filteredJson = None
     apiResponseJson = None
     report = None
+    # arrayVar = []
 
     if request.method == 'POST':
         # Get the uploaded file from the form.
@@ -27,10 +28,21 @@ def index():
         
         # Get json raw object responsed from Nanonet.
         apiResponseJson = apiResponse.json()
-        print("API Response JSON:", apiResponseJson)
+        pages = apiResponseJson.get("result", [])
+        # filteredJson = apiResponseJson
+        filteredJson = [page.get("prediction", []) for page in pages]
+        # print("Filter Json: ",filteredJson)
+        
+        # print("API Response JSON:", apiResponseJson)
+
+        # # To get dataOutput
+        # with open('filterJson.txt', 'w') as f:
+        #     json_string = json.dumps(filteredJson)
+        #     f.write(json_string)
+        
 
         # Filter to get only table cells from json object.
-        filteredJson = apiResponseJson.get("result", [])[0].get("prediction", [])
+        # filteredJson = apiResponseJson.get("result", [])[0].get("prediction", [])
 
     # # Testing with sample response first before api response.
     # with open('data/sampleResponse.json', 'r') as file:
@@ -40,6 +52,12 @@ def index():
     # call buildReport function from model class to build report if the data is present.
     if filteredJson is not None:
         report = buildReport(filteredJson)
+    # # To get dataOutput
+    # with open('onePage.txt', 'w') as f:
+    #     json_string = json.dumps(filteredJson)
+    #     f.write(json_string)
+    
+    
 
     reportJson = json.dumps(report, default=lambda o: o.__dict__, indent=2)
 
