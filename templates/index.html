@@ -119,90 +119,173 @@
           <div id="table-container"></div>
         </div>
 
+        <!-- Pagination added -->
+        <nav aria-label="Page navigation example">
+          <ul class="pagination" id="pagination"></ul>
+        </nav>
+
         <button class="btn btn-outline-success" id="exportBtn" onclick="exportTablesToExcel()">Export</button>
 
     </section>
 
     <script>
+      // Get Json object passed from the backend.
+      var responseData = {{ response_text | tojson | safe }};
+      var jsonData = JSON.parse(responseData);
+  
+      // Function to build and display tables for a specific page
+      function buildAndDisplayPage(pageNumber) {
+        var htmlTable = "<h3 class='text-center mb-4'> Tables </h3>";
 
-        // Get Json object passed from backend.
-        var responseData = {{ response_text | tojson | safe }};
+        // Get the tables for the current page
+        var currentPage = jsonData[pageNumber - 1];
+        if (currentPage) {
+          currentPage.tables.forEach(function (table) {
+            htmlTable += "<table class='w-100 table-name table-bordered' border='1'>";
 
-        var jsonData = JSON.parse(responseData);
+            table.rows.forEach(function (row) {
+              htmlTable += "<tr>";
 
-        // Building table using the Json.
-        function buildTable(jsonData) {
+              row.cells.forEach(function (cell) {
+                if (cell.score < 0.85) {
+                    htmlTable += "<td style='color:red'>" + cell.text + "</td>";
+                } else if (cell.score > 0.95) {
+                    htmlTable += "<td style='color:green'>" + cell.text + "</td>";
+                } else {
+                    htmlTable += "<td>" + cell.text + "</td>";
+                }
+              });
 
-            var htmlTable = "<h3 class='text-center mb-4'> Tables </h3>";
-
-            // Loop tables of Json and build.
-            jsonData.tables.forEach(function (table) {
-
-                htmlTable += "<table class='w-100 table-name table-bordered' border='1'>";
-
-                // Loop through rows in the current table
-                table.rows.forEach(function (row) {
-                    htmlTable += "<tr>";
-
-                    // Loop through cells in the current row
-                    row.cells.forEach(function (cell) {
-
-                        // Highlight cells based on score to notify the assurance.
-                        if (cell.score < 0.85) {
-
-                            htmlTable += "<td style='color:red'>" + cell.text + "</td>";
-                        }
-                        else if (cell.score > 0.95) {
-
-                            htmlTable += "<td style='color:green'>" + cell.text + "</td>";
-                        }
-                        else {
-                            htmlTable += "<td>" + cell.text + "</td>";
-                        }
-
-                    });
-
-                    htmlTable += "</tr>";
-                });
-
-                htmlTable += "</table>";
+              htmlTable += "</tr>";
             });
 
-            return htmlTable;
+            htmlTable += "</table>";
+          });
         }
 
-        // Get the table container element
+        // Display the table in the container
         var tableContainer = document.getElementById("table-container");
+        tableContainer.innerHTML = htmlTable;
+      } 
+  
+      // Function to generate pagination links
+      function generatePaginationLinks() {
+        var paginationContainer = document.getElementById("pagination");
+        paginationContainer.innerHTML = "";
 
-        // Build the table and insert it into the container
-        tableContainer.innerHTML = buildTable(jsonData);
+        for (var i = 1; i <= jsonData.length; i++) {
+          var li = document.createElement("li");
+          li.className = "page-item";
+          var a = document.createElement("a");
+          a.className = "page-link";
+          a.href = "#";
+          a.textContent = i;
+          a.onclick = function () {
+              var pageNumber = parseInt(this.textContent);
+              buildAndDisplayPage(pageNumber);
+          };
+          li.appendChild(a);
+          paginationContainer.appendChild(li);
+        }
+      }
+  
+      // Initial page load
+      buildAndDisplayPage(1);
+      generatePaginationLinks();
+  
+      // Export tables to excel
+      function exportTablesToExcel() {
+        var tableElements = document.getElementsByClassName("table-name");
+        console.log("Export Excel Files: ", tableElements);
 
-        // Export tables to excel
-        function exportTablesToExcel() {
-          var tableElements = document.getElementsByClassName("table-name")
-          console.log("Export Excel Files: ",tableElements)
-          
-          var workbook = XLSX.utils.book_new();
-          var tables = Array.from(tableElements)
-          tables.forEach(function(table, index) {
+        var workbook = XLSX.utils.book_new();
+        var tables = Array.from(tableElements);
+        tables.forEach(function (table, index) {
             var sheet = XLSX.utils.table_to_sheet(table);
             XLSX.utils.book_append_sheet(workbook, sheet, 'Sheet' + (index + 1));
+        });
+  
+        // Save the workbook to a file
+        XLSX.writeFile(workbook, 'exported_data.xlsx');
+      }
+    </script>
+
+
+<!--     old
+    <script>
+      // Get Json object passed from backend.
+      var responseData = {{ response_text | tojson | safe }};
+      var jsonData = JSON.parse(responseData);
+      console.log("Json Data: ",jsonData);
+      // Get the table container element
+      var tableContainer = document.getElementById("table-container");
+
+      // Build the table and insert it into the container
+      tableContainer.innerHTML = buildTable(jsonData);
+
+      // Building table using the Json.
+      function buildTable(jsonData) {
+          var htmlTable = "<h3 class='text-center mb-4'> Tables </h3>";
+
+          // Loop through each page's tables
+          console.log("Json Data 2: ",jsonData);
+          jsonData.forEach(function (pageData) {
+              var pageTables = pageData.tables || []; // Handle undefined or empty arrays
+
+              // Loop through tables in the current page
+              pageTables.forEach(function (table) {
+                  htmlTable += "<table class='w-100 table-name table-bordered' border='1'>";
+
+                  // Loop through rows in the current table
+                  table.rows.forEach(function (row) {
+                      htmlTable += "<tr>";
+
+                      // Loop through cells in the current row
+                      row.cells.forEach(function (cell) {
+                          // Highlight cells based on score to notify the assurance.
+                          if (cell.score < 0.85) {
+                              htmlTable += "<td style='color:red'>" + cell.text + "</td>";
+                          } else if (cell.score > 0.95) {
+                              htmlTable += "<td style='color:green'>" + cell.text + "</td>";
+                          } else {
+                              htmlTable += "<td>" + cell.text + "</td>";
+                          }
+                      });
+
+                      htmlTable += "</tr>";
+                  });
+
+                  htmlTable += "</table>";
+              });
           });
+
+          return htmlTable;
+      }
+
+      // Export tables to excel
+      function exportTablesToExcel() {
+          var tableElements = document.getElementsByClassName("table-name")
+          console.log("Export Excel Files: ", tableElements)
+
+          var workbook = XLSX.utils.book_new();
+
+          // Use a single sheet for all pages
+          var combinedSheet = XLSX.utils.table_to_sheet(tableContainer);
+          XLSX.utils.book_append_sheet(workbook, combinedSheet, 'CombinedSheet');
 
           // Save the workbook to a file
           XLSX.writeFile(workbook, 'exported_data.xlsx');
-        }
-
-    </script>
+      }
+    </script> -->
 
     
-      <!-- ======= Footer ======= -->
-      <footer id="footer">
-        <div class="container">
-            <div class="copyright">
-            &copy; Copyright <strong><span>Codia</span></strong>. All Rights Reserved
-            </div>
-        </div>
+    <!-- ======= Footer ======= -->
+    <footer id="footer">
+      <div class="container">
+          <div class="copyright">
+          &copy; Copyright <strong><span>Codia</span></strong>. All Rights Reserved
+          </div>
+      </div>
     
   </body>
 </html>
