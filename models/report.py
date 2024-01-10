@@ -43,7 +43,7 @@ class Report:
     def __init__(self):
         self.pages = []
 
-    def add_table(self, page):
+    def add_page(self, page):
         self.pages.append(page)
 
     def __repr__(self):
@@ -52,19 +52,14 @@ class Report:
 
 def buildReport(tablesJson):
     # function to build report.
-
     report = Report()
 
     # Loop through each page's tables
     for page_data in tablesJson:
-        # If page_data is a list directly containing tables
-        if isinstance(page_data, list):
-            page_tables = page_data
-        else:
-            page_tables = page_data.get("tables", [])
+        page = Page()
 
         # Loop through tables in the current page
-        for table_data in page_tables:
+        for table_data in page_data:
             table = Table()
 
             # Loop every cell in a table to rebuild rows and columns.
@@ -90,6 +85,7 @@ def buildReport(tablesJson):
                     existing_row.cells.append(cell)
 
             # Add created table with full of data into report object.
-            report.add_table(table)
+            page.add_table(table)
+        report.add_page(page)
 
     return report

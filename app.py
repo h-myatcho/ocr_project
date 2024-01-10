@@ -24,25 +24,14 @@ def index():
         auth = requests.auth.HTTPBasicAuth('4e121e69-8f9e-11ee-8a1f-4a1e4b95b6ce', '')
 
         apiResponse = requests.post(url, headers=headers, auth=auth, files=files)
-        # print("API Response:", apiResponse.text)
         
         # Get json raw object responsed from Nanonet.
         apiResponseJson = apiResponse.json()
-        pages = apiResponseJson.get("result", [])
-        # filteredJson = apiResponseJson
-        filteredJson = [page.get("prediction", []) for page in pages]
-        # print("Filter Json: ",filteredJson)
-        
-        # print("API Response JSON:", apiResponseJson)
-
-        # # To get dataOutput
-        # with open('filterJson.txt', 'w') as f:
-        #     json_string = json.dumps(filteredJson)
-        #     f.write(json_string)
-        
 
         # Filter to get only table cells from json object.
-        # filteredJson = apiResponseJson.get("result", [])[0].get("prediction", [])
+        pages = apiResponseJson.get("result", [])
+        filteredJson = [page.get("prediction", []) for page in pages]
+    
 
     # # Testing with sample response first before api response.
     # with open('data/sampleResponse.json', 'r') as file:
@@ -52,12 +41,11 @@ def index():
     # call buildReport function from model class to build report if the data is present.
     if filteredJson is not None:
         report = buildReport(filteredJson)
+
     # # To get dataOutput
     # with open('onePage.txt', 'w') as f:
     #     json_string = json.dumps(filteredJson)
     #     f.write(json_string)
-    
-    
 
     reportJson = json.dumps(report, default=lambda o: o.__dict__, indent=2)
 
