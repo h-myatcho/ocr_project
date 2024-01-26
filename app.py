@@ -18,10 +18,10 @@ def index():
         uploaded_file = request.files['file']
 
         # Make the API request and obtain the JSON response.
-        url = 'https://app.nanonets.com/api/v2/OCR/Model/f8f086b3-7480-4e2b-bef7-0e5e8bd08479/LabelUrls/?async=false'
+        url = 'your-model-url-here'
         headers = {'accept': 'application/x-www-form-urlencoded'}
         files = {'file': (uploaded_file.filename, uploaded_file.stream, uploaded_file.mimetype)}
-        auth = requests.auth.HTTPBasicAuth('4e121e69-8f9e-11ee-8a1f-4a1e4b95b6ce', '')
+        auth = requests.auth.HTTPBasicAuth('your-nanonets-api-key-here', '')
 
         apiResponse = requests.post(url, headers=headers, auth=auth, files=files)
         
